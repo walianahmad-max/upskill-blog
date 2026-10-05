@@ -1,0 +1,553 @@
+===== index.html =====
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Explore our latest news, tutorials, and insights."
+    />
+    <title>Blog - Upskill Learning Center</title>
+  </head>
+  <body class="bg-gray-50 font-sans text-gray-800">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+===== package.json =====
+{
+  "name": "upskill-blog-tailwind",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "vite": "^6.1.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "3.4.17",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20"
+  }
+}
+
+
+===== postcss.config.js =====
+export default { plugins: { tailwindcss: {}, autoprefixer: {} } };
+
+
+===== src/App.jsx =====
+import { useState } from "react";
+import Header from "./components/Header.jsx";
+import BlogCard from "./components/BlogCard.jsx";
+import Footer from "./components/Footer.jsx";
+import { categories, posts } from "./data/posts.js";
+export default function App() {
+  const [category, setCategory] = useState("All");
+  const filteredPosts =
+    category === "All"
+      ? posts
+      : posts.filter((post) => post.category === category);
+  return (
+    <>
+      <Header />
+      <main>
+        <section className="bg-gradient-to-br from-[#00C2FF]/10 to-brand/10 px-4 py-24 text-center">
+          <h1 className="mb-4 text-5xl font-extrabold leading-none text-slate-700 md:text-6xl">
+            Our{" "}
+            <span className="bg-gradient-to-r from-[#00C2FF] to-brand bg-clip-text text-transparent">
+              Blog
+            </span>
+          </h1>
+          <p className="mx-auto max-w-2xl text-lg text-gray-700 md:text-xl">
+            Explore our latest news, tutorials, and insights.
+          </p>
+        </section>
+        <section
+          className="mx-auto flex max-w-7xl flex-wrap justify-center gap-4 px-6 py-6"
+          aria-label="Filter blog posts"
+        >
+          {categories.map((name) => (
+            <button
+              key={name}
+              className={
+                "rounded-full border px-4 py-2 transition-colors hover:bg-brand hover:text-white " +
+                (name === category
+                  ? "border-brand bg-brand text-white"
+                  : "border-gray-200 bg-transparent")
+              }
+              aria-pressed={name === category}
+              onClick={() => setCategory(name)}
+            >
+              {name}
+            </button>
+          ))}
+        </section>
+        <section
+          className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-20 md:grid-cols-2 lg:grid-cols-3"
+          aria-label="Blog posts"
+          aria-live="polite"
+        >
+          {filteredPosts.map((post) => (
+            <BlogCard key={post.id} post={post} />
+          ))}
+        </section>
+        {filteredPosts.length === 0 && (
+          <p className="-mt-12 pb-8 text-center text-sky-500">
+            No blog posts found for {category}. Please try another category.
+          </p>
+        )}
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+
+===== src/components/BlogCard.jsx =====
+const images = import.meta.glob("../assets/blog-*", {
+  eager: true,
+  query: "?url",
+  import: "default",
+});
+export default function BlogCard({ post }) {
+  return (
+    <article
+      className="overflow-hidden rounded-2xl bg-white shadow-lg transition-[transform,box-shadow] duration-300 hover:-translate-y-[6px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
+      data-category={post.category}
+    >
+      <a href={post.url}>
+        <img
+          className="h-[220px] w-full rounded-t-xl object-cover"
+          src={images["../assets/" + post.image]}
+          alt={post.title}
+        />
+      </a>
+      <div className="p-6">
+        <a href={post.url}>
+          <span className="mb-2 inline-block rounded-full bg-[#E6F7FF] px-2 py-1 text-xs font-medium text-brand hover:bg-brand hover:text-white">
+            {post.category}
+          </span>
+          <h2 className="mb-2 text-xl font-bold text-gray-900">{post.title}</h2>
+          <p className="mb-4 text-sm text-gray-600">{post.excerpt}</p>
+        </a>
+        <div className="flex items-center justify-between gap-2 text-sm text-gray-500">
+          <a href={post.url}>
+            <i className="fas fa-calendar-alt mr-1" aria-hidden="true" />{" "}
+            {post.date}
+          </a>
+          <a
+            className="flex items-center gap-1 whitespace-nowrap rounded-lg bg-brand px-3 py-1 text-sm text-white transition-colors hover:bg-[#007acc]"
+            href={post.url}
+          >
+            Read More{" "}
+            <i className="fas fa-arrow-right text-xs" aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+
+===== src/components/Footer.jsx =====
+import qr from "../assets/whatsapp-qr.png";
+import sparkle from "../assets/sparkle.png";
+const base = "https://www.upskillacademy.tech";
+const groups = [
+  {
+    title: "Services",
+    links: [
+      ["Tech Services", "/services"],
+      ["Online Courses", "/courses"],
+      ["Scholarship", "/scholarship-applications"],
+      ["Careers", "/careers"],
+      ["Student Projects", "/student-projects"],
+      ["Partners", "/partners"],
+      ["Corporate Training", "#"],
+    ],
+  },
+  {
+    title: "Helpful Links",
+    links: [
+      ["About Us", "/about"],
+      ["Our Instructors", "/about"],
+      ["Success Stories", "/testimonials"],
+      ["Blog", "/blog"],
+      ["FAQ", "/faq"],
+    ],
+  },
+  {
+    title: "Information",
+    links: [
+      ["Privacy Policy", "/privacy-policy"],
+      ["Terms of Service", "/terms-of-service"],
+      ["Contact Us", "/about"],
+    ],
+  },
+];
+export default function Footer() {
+  return (
+    <>
+      <section className="relative top-6 flex items-center justify-center px-4 sm:px-6 lg:px-10">
+        <div className="relative mt-5 w-full max-w-[1050px] overflow-hidden rounded-2xl bg-gradient-to-r from-brand to-brand/60 py-4 sm:rounded-[30px] md:py-6">
+          <img
+            className="absolute right-8 top-6 hidden h-24 w-24 object-contain md:block lg:right-16 lg:top-10 lg:h-28 lg:w-28"
+            src={sparkle}
+            alt="Sparkle"
+          />
+          <div className="relative z-10 px-4 sm:px-6 md:px-8">
+            <h2 className="mb-2 max-w-2xl text-sm font-bold leading-relaxed text-white sm:text-base md:text-lg lg:text-xl">
+              Don't wait — take the next step toward your brighter future.
+            </h2>
+            <p className="mb-4 text-xs font-medium text-white sm:text-sm md:mb-6 md:text-base lg:text-xl">
+              Your journey begins with one simple action today
+            </p>
+            <a
+              href={base + "/student/login"}
+              className="block w-full rounded-full bg-white px-4 py-2 text-center text-xs font-semibold text-brand shadow-xl transition-all duration-300 hover:scale-105 hover:bg-gray-100 sm:inline-block sm:w-auto sm:px-5 sm:text-sm md:px-6 md:py-2.5"
+            >
+              Start Learning
+            </a>
+          </div>
+        </div>
+      </section>
+      <footer className="bg-gradient-to-tr from-[#E0F3FF] via-white to-[#F5FBFF] p-6 text-gray-800 shadow-[0_-6px_20px_rgba(0,0,0,0.08)] sm:p-10 lg:p-16">
+        <div className="mx-auto max-w-7xl rounded-2xl border border-gray-100 bg-white px-4 py-8 shadow-sm sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-10 text-center sm:grid-cols-2 md:grid-cols-4 md:text-left">
+            <div className="">
+              <p className="mx-auto mb-6 max-w-xs text-sm leading-relaxed text-gray-700 md:mx-0">
+                Empowering Afghan Youth with Skills for a Digital Future{" "}
+                <b>-Powered by Upskill</b>
+              </p>
+              <div className="mb-6 flex justify-center gap-4 text-lg text-gray-500 md:justify-start">
+                {[
+                  ["facebook-f", "https://www.facebook.com/upskill5000/"],
+                  ["twitter", "#"],
+                  ["instagram", "https://www.instagram.com/upskill555/"],
+                  ["linkedin-in", "https://www.linkedin.com/company/up-skil/"],
+                ].map(([icon, url]) => (
+                  <a
+                    className="transition-colors hover:text-brand"
+                    key={icon}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={icon}
+                  >
+                    <i className={"fab fa-" + icon} />
+                  </a>
+                ))}
+              </div>
+              <p className="mb-4 text-sm font-medium text-gray-700">
+                Let's Connect
+              </p>
+              <a
+                href="https://wa.me/93781765151?text=Hello%20Upskill!"
+                aria-label="Chat with us on WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <img
+                  className="mx-auto h-16 w-16 rounded-xl border border-gray-200 bg-white p-1 shadow-md transition-transform duration-300 hover:scale-105 sm:h-20 sm:w-20 md:mx-0 md:h-24 md:w-24 lg:h-28 lg:w-28"
+                  src={qr}
+                  alt="WhatsApp QR Code"
+                />
+              </a>
+            </div>
+            {groups.map((group) => (
+              <div key={group.title} className="">
+                <h4 className="mb-4 text-base font-semibold text-gray-900">
+                  {group.title}
+                </h4>
+                <ul className="space-y-2">
+                  {group.links.map(([label, path]) => (
+                    <li key={label}>
+                      <a
+                        className="inline-block text-sm text-gray-600 transition-colors hover:text-brand"
+                        href={
+                          path === "/blog"
+                            ? "/blog"
+                            : path === "#"
+                              ? "#"
+                              : base + path
+                        }
+                      >
+                        {label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                {group.title === "Information" && (
+                  <div className="mt-6 space-y-2 text-xs text-gray-600">
+                    <p className="flex items-center justify-center md:justify-start">
+                      <i className="fas fa-map-marker-alt mr-3 text-sm text-brand" />
+                      Kabul, Afghanistan
+                    </p>
+                    <p className="flex items-center justify-center md:justify-start">
+                      <i className="fas fa-phone mr-3 text-sm text-brand" />
+                      <a href="https://wa.me/93781765151">+93 78 176 5151</a>
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-gray-200 pt-6 text-xs text-gray-500 md:flex-row md:gap-0">
+            <div className="mb-4 flex gap-4 md:mb-0">
+              <a
+                className="transition-colors hover:text-brand"
+                href={base + "/privacy-policy"}
+              >
+                Privacy &amp; Policy
+              </a>
+              <a
+                className="transition-colors hover:text-brand"
+                href={base + "/terms-of-service"}
+              >
+                Terms &amp; Condition
+              </a>
+            </div>
+            <p className="text-center">
+              © 2026 Upskill Online. All rights reserved.
+              <br />
+              Powered by <b className="font-semibold text-brand">Upskill</b>
+            </p>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
+
+
+===== src/components/Header.jsx =====
+import { useState } from "react";
+import logo from "../assets/logo.png";
+const base = "https://www.upskillacademy.tech";
+const links = [
+  ["Home", "/"],
+  ["Courses", "/courses"],
+  ["Testimonials", "/testimonials"],
+  ["Scholarship", "/scholarship-applications"],
+  ["About", "/about"],
+  ["Partners", "/partners"],
+];
+export default function Header() {
+  const [open, setOpen] = useState(false);
+  return (
+    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur transition-shadow duration-200">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href={base} aria-label="Upskill home">
+          <img className="h-16 w-auto" src={logo} alt="Upskill Online Logo" />
+        </a>
+        <div className="ml-10 hidden items-baseline gap-8 lg:flex">
+          {links.map(([label, path]) => (
+            <a
+              key={label}
+              href={base + path}
+              className="relative px-3 py-2 text-sm font-medium text-gray-900 transition-all duration-200 hover:text-brand"
+            >
+              {label}
+              {label === "Scholarship" && (
+                <span className="absolute -right-3 -top-2 animate-pulse rounded-full border border-sky-200 bg-sky-500 px-2 py-0.5 text-[10px] font-semibold uppercase text-white shadow-sm">
+                  New
+                </span>
+              )}
+            </a>
+          ))}
+        </div>
+        <div className="hidden items-center gap-4 lg:flex">
+          <a
+            className="rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-900 shadow-sm transition hover:bg-gray-50"
+            href={base + "/login"}
+          >
+            Log in
+          </a>
+          <a
+            className="rounded-full bg-gradient-to-r from-brand to-brand/70 px-6 py-3 text-sm font-medium text-white transition-all hover:shadow-lg"
+            href={base + "/register"}
+          >
+            Start Learning
+          </a>
+        </div>
+        <button
+          className="rounded-xl border border-gray-200 p-2 shadow-sm transition hover:text-brand active:scale-95 lg:hidden"
+          aria-label="Toggle navigation"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          onClick={() => setOpen(!open)}
+        >
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              d={open ? "M6 6l12 12M6 18L18 6" : "M4 7h16M4 12h16M4 17h16"}
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </nav>
+      {open && (
+        <div
+          className="absolute left-0 top-full w-full space-y-1 border-t border-gray-100 bg-white px-4 pb-4 pt-2 shadow-lg lg:hidden"
+          id="mobile-menu"
+        >
+          {links.map(([label, path]) => (
+            <a
+              key={label}
+              href={base + path}
+              className="block rounded-md px-3 py-2 hover:bg-gray-50 hover:text-sky-500"
+            >
+              {label}
+            </a>
+          ))}
+          <a
+            className="mt-2 block text-center rounded-full border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-900 shadow-sm transition hover:bg-gray-50"
+            href={base + "/login"}
+          >
+            Log in
+          </a>
+          <a
+            className="mt-2 block text-center rounded-full bg-gradient-to-r from-brand to-brand/70 px-6 py-3 text-sm font-medium text-white transition-all hover:shadow-lg"
+            href={base + "/register"}
+          >
+            Start Learning
+          </a>
+        </div>
+      )}
+    </header>
+  );
+}
+
+
+===== src/data/posts.js =====
+export const categories = [
+  "All",
+  "Accounting & Finance",
+  "AI",
+  "Backend Development",
+  "Cloud Computing",
+  "Data Science",
+  "Digital Marketing",
+  "Entrepreneurship",
+  "Freelancing",
+  "Frontend Development",
+  "Game Development",
+  "Graphic Design",
+  "Microsoft Office",
+  "Mobile Development",
+  "UI/UX Design",
+  "Video Editing & Animation",
+  "Web Development",
+];
+export const posts = [
+  {
+    id: 1,
+    title: "Master  Essential Computer Skills with the ICDL Program",
+    category: "Microsoft Office",
+    excerpt:
+      "Master Essential Computer Skills with the ICDL ProgramBuild Your Digital Skills in Just 6 Months at Upskill BootcampIn t...",
+    url: "https://www.upskillacademy.tech/blog/master-essential-computer-skills-with-the-icdl-program",
+    image: "blog-1.jpg",
+    date: "Dec 09, 2025",
+  },
+  {
+    id: 2,
+    title: "Master Graphic Design in 6 Months at Upskill",
+    category: "Graphic Design",
+    excerpt:
+      "Turn Your Creativity Into a Professional CareerIn today’s digital world, graphic design is more than just attractive vis...",
+    url: "https://www.upskillacademy.tech/blog/master-graphic-design-in-6-months-at-upskill",
+    image: "blog-2.jpg",
+    date: "Dec 09, 2025",
+  },
+  {
+    id: 3,
+    title: "Meet the Founder of Upskill Learning Center – Said Shah",
+    category: "Entrepreneurship",
+    excerpt:
+      "Meet the Founder of Upskill Learning Center – Said ShahIn a rapidly evolving digital world, access to quality education...",
+    url: "https://www.upskillacademy.tech/blog/meet-the-founder-of-upskill-learning-center-said-shah",
+    image: "blog-3.jpg",
+    date: "Dec 09, 2025",
+  },
+  {
+    id: 4,
+    title: "Full Stack Developer vs DevOps Engineer",
+    category: "Backend Development",
+    excerpt:
+      "Full Stack Developer vs. DevOps Engineer: Key Differences ExplainedIn today’s software development landscape, two roles...",
+    url: "https://www.upskillacademy.tech/blog/full-stack-developer-vs-devops-engineer",
+    image: "blog-4.png",
+    date: "Dec 09, 2025",
+  },
+  {
+    id: 5,
+    title: "Backend Development Program at Upskill",
+    category: "Backend Development",
+    excerpt:
+      "Backend Development Program at Upskill Online AcademyBackend development is the powerhouse behind every website and appl...",
+    url: "https://www.upskillacademy.tech/blog/backend-development-program-at-upskill",
+    image: "blog-5.jpg",
+    date: "Dec 09, 2025",
+  },
+  {
+    id: 6,
+    title: "Learn Front-End Development at Upskill Online Academy",
+    category: "Frontend Development",
+    excerpt:
+      "Learn Front-End Development at Upskill Online Academy&nbsp;Embarking on the journey of web development is like stepping...",
+    url: "https://www.upskillacademy.tech/blog/learn-front-end-development-at-upskill-online-academy",
+    image: "blog-6.jpg",
+    date: "Dec 09, 2025",
+  },
+];
+
+
+===== src/main.jsx =====
+import React from "react";
+import { createRoot } from "react-dom/client";
+import App from "./App.jsx";
+import "./assets/fontawesome.css";
+import "./style.css";
+createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+);
+
+
+===== src/style.css =====
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+===== tailwind.config.js =====
+export default {
+  content: ["./index.html", "./src/**/*.{js,jsx}"],
+  theme: { extend: { colors: { brand: "#0099F4" } } },
+  plugins: [],
+};
+
+
+===== vite.config.js =====
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+export default defineConfig({ plugins: [react()], base: "./" });

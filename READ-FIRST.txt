@@ -1,12 +1,1 @@
-راهنمای اجرا
 
-1. ZIP را دانلود کنید. در ویندوز راست کلیک و Extract All بزنید.
-2. فولدری را در VS Code باز کنید که package.json در داخل آن است.
-3. Terminal > New Terminal
-4. npm install
-5. npm run dev
-6. آدرس Local را در مرورگر باز کنید.
-
-روش ساده‌تر: پس از Extract، فایل START-WINDOWS.bat را باز کنید.
-
-package.json باید کود JSON داشته باشد. تمام کودها در SOURCE-CODE.txt هم موجود است.
